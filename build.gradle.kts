@@ -28,6 +28,7 @@ dependencies {
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
+    testImplementation("io.rest-assured:kotlin-extensions")
 }
 
 group = "com.vuceljic.elena"
