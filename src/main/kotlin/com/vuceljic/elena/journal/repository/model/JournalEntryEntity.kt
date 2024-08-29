@@ -1,16 +1,11 @@
-package com.vuceljic.elena.journal.model
+package com.vuceljic.elena.journal.repository.model
 
-import com.vuceljic.elena.journal.dto.InstantSerializer
-import com.vuceljic.elena.journal.dto.LocalDateTimeSerializer
 import jakarta.persistence.*
-import kotlinx.serialization.Serializable
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.SourceType
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
-import java.time.LocalDateTime
 
-@Serializable
 @Entity(name = "journal_entry")
 open class JournalEntryEntity {
     @Id
@@ -27,14 +22,11 @@ open class JournalEntryEntity {
 
     lateinit var description: String
 
-    @Serializable(with = LocalDateTimeSerializer::class)
-    lateinit var entryDate: LocalDateTime
+    lateinit var entryDate: Instant
 
     @field:CreationTimestamp(source = SourceType.DB)
-    @Serializable(with = InstantSerializer::class)
     lateinit var createdAt: Instant
 
     @field:UpdateTimestamp(source = SourceType.DB)
-    @Serializable(with = InstantSerializer::class)
     lateinit var updatedAt: Instant
 }

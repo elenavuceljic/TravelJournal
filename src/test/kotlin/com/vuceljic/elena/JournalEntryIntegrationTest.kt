@@ -1,6 +1,6 @@
 package com.vuceljic.elena
 
-import com.vuceljic.elena.journal.resource.JournalEntryResource
+import com.vuceljic.elena.journal.resource.JournalResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.http.ContentType
@@ -11,7 +11,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
-@TestHTTPEndpoint(JournalEntryResource::class)
+@TestHTTPEndpoint(JournalResource::class)
 open class JournalEntryIntegrationTest {
 
     @Test
@@ -25,7 +25,7 @@ open class JournalEntryIntegrationTest {
             body("id", equalTo(1))
             body("title", equalTo("Iceland"))
             body("description", equalTo("Aurora Borealis hunting"))
-            body("entryDate", equalTo("1995-09-12T00:00:00"))
+            body("entryDate", equalTo("1995-09-12T00:00:00Z"))
         }
     }
 
@@ -75,7 +75,7 @@ open class JournalEntryIntegrationTest {
             body("id", equalTo(2))
             body("title", equalTo("Tenerife"))
             body("description", equalTo("Festival circling"))
-            body("entryDate", equalTo("1995-09-15T00:00:00"))
+            body("entryDate", equalTo("1995-09-15T00:00:00Z"))
         }
     }
 
@@ -109,7 +109,7 @@ open class JournalEntryIntegrationTest {
         {
           "title": "Tenerife",
           "description": "Festival circling",
-          "entryDate": "1995-09-15T00:00:00"
+          "entryDate": "1995-09-15T00:00:00Z"
         }
     """.trimIndent()
 
