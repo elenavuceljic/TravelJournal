@@ -2,6 +2,7 @@ package com.vuceljic.elena.journal.infrastructure.persistence
 
 import com.vuceljic.elena.journal.domain.model.JournalEntry
 import jakarta.persistence.*
+import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.SourceType
 import org.hibernate.annotations.UpdateTimestamp
@@ -19,6 +20,8 @@ open class JournalEntryEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "journal_entry_seq")
     var id: Long? = null
 
+    @Column(length = 40)
+    @field:Size(min = 1, max = 40, message = "Title must be between 1 and 40 characters")
     lateinit var title: String
 
     lateinit var description: String

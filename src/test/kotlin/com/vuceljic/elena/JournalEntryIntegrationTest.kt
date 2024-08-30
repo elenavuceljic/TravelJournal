@@ -67,7 +67,7 @@ open class JournalEntryIntegrationTest {
         Given {
             pathParam("id", "2")
             contentType(ContentType.JSON)
-            body(testJournalEntryString)
+            body(testJournalEntry)
         } When {
             put("/{id}")
         } Then {
@@ -80,11 +80,27 @@ open class JournalEntryIntegrationTest {
     }
 
     @Test
+    fun testUpdateJournalEntryWithTitleTooLong() {
+        Given {
+            pathParam("id", "2")
+            contentType(ContentType.JSON)
+            body(testJournalEntryWithTitleTooLong)
+        } When {
+            put("/{id}")
+        } Then {
+            statusCode(400)
+            body("errors[0].property", equalTo("title"))
+            body("errors[0].message", equalTo("Title must be between 1 and 40 characters"))
+            body("errors[0].invalidValue", equalTo("Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife"))
+        }
+    }
+
+    @Test
     fun testUpdateJournalEntryNotFound() {
         Given {
             pathParam("id", "5")
             contentType(ContentType.JSON)
-            body(testJournalEntryString)
+            body(testJournalEntry)
         } When {
             put("/{id}")
         } Then {
@@ -96,7 +112,7 @@ open class JournalEntryIntegrationTest {
     fun testCreateJournalEntry() {
         Given {
             contentType(ContentType.JSON)
-            body(testJournalEntryString)
+            body(testJournalEntry)
         } When {
             post("")
         } Then {
@@ -105,9 +121,32 @@ open class JournalEntryIntegrationTest {
         }
     }
 
-    private val testJournalEntryString = """
+    @Test
+    fun testCreateJournalEntryWithTitleTooLong() {
+        Given {
+            contentType(ContentType.JSON)
+            body(testJournalEntryWithTitleTooLong)
+        } When {
+            post("")
+        } Then {
+            statusCode(400)
+            body("errors[0].property", equalTo("title"))
+            body("errors[0].message", equalTo("Title must be between 1 and 40 characters"))
+            body("errors[0].invalidValue", equalTo("Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife"))
+        }
+    }
+
+    private val testJournalEntry = """
         {
           "title": "Tenerife",
+          "description": "Festival circling",
+          "entryDate": "1995-09-15T00:00:00Z"
+        }
+    """.trimIndent()
+
+    private val testJournalEntryWithTitleTooLong = """
+        {
+          "title": "Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife",
           "description": "Festival circling",
           "entryDate": "1995-09-15T00:00:00Z"
         }
