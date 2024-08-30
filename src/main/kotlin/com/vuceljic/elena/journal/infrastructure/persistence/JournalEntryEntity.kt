@@ -1,5 +1,6 @@
-package com.vuceljic.elena.journal.repository.model
+package com.vuceljic.elena.journal.infrastructure.persistence
 
+import com.vuceljic.elena.journal.domain.model.JournalEntry
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.SourceType
@@ -30,3 +31,18 @@ open class JournalEntryEntity {
     @field:UpdateTimestamp(source = SourceType.DB)
     lateinit var updatedAt: Instant
 }
+
+fun JournalEntryEntity.toDomain(): JournalEntry = JournalEntry(
+    id = id!!,
+    title = title,
+    description = description,
+    entryDate = entryDate
+)
+
+fun JournalEntry.toEntity(): JournalEntryEntity = JournalEntryEntity().also {
+    it.id = id
+    it.title = title
+    it.description = description
+    it.entryDate = entryDate
+}
+

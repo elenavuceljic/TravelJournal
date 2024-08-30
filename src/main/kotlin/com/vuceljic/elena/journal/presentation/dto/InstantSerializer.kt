@@ -1,4 +1,4 @@
-package com.vuceljic.elena.journal.resource.dto
+package com.vuceljic.elena.journal.presentation.dto
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

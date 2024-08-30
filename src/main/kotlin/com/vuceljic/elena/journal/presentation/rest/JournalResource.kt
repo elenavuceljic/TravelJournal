@@ -1,8 +1,8 @@
-package com.vuceljic.elena.journal.resource
+package com.vuceljic.elena.journal.presentation.rest
 
-import com.vuceljic.elena.journal.resource.dto.JournalEntryCreateUpdateRequest
-import com.vuceljic.elena.journal.resource.dto.JournalEntryDto
-import com.vuceljic.elena.journal.service.JournalService
+import com.vuceljic.elena.journal.application.services.JournalService
+import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUpdateRequest
+import com.vuceljic.elena.journal.presentation.dto.JournalEntryDto
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*

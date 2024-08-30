@@ -1,6 +1,6 @@
 package com.vuceljic.elena
 
-import com.vuceljic.elena.journal.resource.JournalResource
+import com.vuceljic.elena.journal.presentation.rest.JournalResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.http.ContentType
