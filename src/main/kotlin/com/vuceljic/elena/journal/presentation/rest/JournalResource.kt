@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import org.jboss.resteasy.reactive.RestQuery
 import java.net.URI
 
 @Path("/journal")
@@ -19,8 +20,11 @@ class JournalResource {
     lateinit var journalService: JournalService
 
     @GET
-    fun getAll(): List<JournalEntryDto> {
-        return journalService.getAll()
+    fun getAll(
+        @RestQuery("page") @DefaultValue("0") page: Int,
+        @RestQuery("pageSize") @DefaultValue("25") pageSize: Int
+    ): List<JournalEntryDto> {
+        return journalService.getAll(page, pageSize)
     }
 
     @GET

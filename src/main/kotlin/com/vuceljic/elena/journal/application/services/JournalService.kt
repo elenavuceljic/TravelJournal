@@ -14,8 +14,8 @@ class JournalService {
     @Inject
     lateinit var journalRepository: JournalRepository
 
-    fun getAll(): List<JournalEntryDto> {
-        return journalRepository.getAll().map { it.toDto() }
+    fun getAll(page: Int, pageSize: Int): List<JournalEntryDto> {
+        return journalRepository.getAll(page, pageSize).map { it.toDto() }
     }
 
     fun findEntryById(id: Long): JournalEntryDto? {
