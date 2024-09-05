@@ -5,6 +5,7 @@ import com.vuceljic.elena.journal.presentation.dto.JournalEntryDto
 import com.vuceljic.elena.journal.presentation.dto.toDto
 import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUpdateRequest
 import com.vuceljic.elena.journal.presentation.http.request.toDomain
+import com.vuceljic.elena.journal.presentation.http.respose.PaginatedResponse
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 
@@ -14,8 +15,15 @@ class JournalService {
     @Inject
     lateinit var journalRepository: JournalRepository
 
-    fun getAll(page: Int, pageSize: Int): List<JournalEntryDto> {
-        return journalRepository.getAll(page, pageSize).map { it.toDto() }
+    fun getAll(page: Int, pageSize: Int): PaginatedResponse<JournalEntryDto> {
+        val entryDtoList = journalRepository.getAll(page, pageSize).map { it.toDto() }
+        val totalItems = journalRepository.countAll()
+        val totalPages = totalItems.ceilDiv(pageSize)
+        return PaginatedResponse(entryDtoList, page, totalPages, totalItems)
+    }
+
+    private fun Long.ceilDiv(divisor: Int): Int {
+        return ((this + divisor - 1) / divisor).toInt()
     }
 
     fun findEntryById(id: Long): JournalEntryDto? {

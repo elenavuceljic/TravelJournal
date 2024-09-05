@@ -8,4 +8,5 @@ interface JournalRepository {
     fun delete(id: Long): Boolean
     fun update(id: Long, updatedEntry: JournalEntry): JournalEntry?
     fun insert(newEntry: JournalEntry): Long?
+    fun countAll(): Long
 }

@@ -3,6 +3,7 @@ package com.vuceljic.elena.journal.presentation.rest
 import com.vuceljic.elena.journal.application.services.JournalService
 import com.vuceljic.elena.journal.presentation.dto.JournalEntryDto
 import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUpdateRequest
+import com.vuceljic.elena.journal.presentation.http.respose.PaginatedResponse
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
@@ -22,8 +23,8 @@ class JournalResource {
     @GET
     fun getAll(
         @RestQuery("page") @DefaultValue("0") page: Int,
-        @RestQuery("pageSize") @DefaultValue("25") pageSize: Int
-    ): List<JournalEntryDto> {
+        @RestQuery("size") @DefaultValue("25") pageSize: Int
+    ): PaginatedResponse<JournalEntryDto> {
         return journalService.getAll(page, pageSize)
     }
 

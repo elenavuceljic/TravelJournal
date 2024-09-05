@@ -14,13 +14,9 @@ class JournalRepositoryImpl : PanacheRepository<JournalEntryEntity>, JournalRepo
         return query.list().map { it.toDomain() }
     }
 
-    override fun find(id: Long): JournalEntry? {
-        return findById(id)?.toDomain()
-    }
+    override fun find(id: Long): JournalEntry? = findById(id)?.toDomain()
 
-    override fun delete(id: Long): Boolean {
-        return deleteById(id)
-    }
+    override fun delete(id: Long): Boolean = deleteById(id)
 
     override fun update(id: Long, updatedEntry: JournalEntry): JournalEntry? {
         val entity = findById(id) ?: return null
@@ -38,4 +34,6 @@ class JournalRepositoryImpl : PanacheRepository<JournalEntryEntity>, JournalRepo
         persist(entity)
         return entity.id
     }
+
+    override fun countAll(): Long = count()
 }
