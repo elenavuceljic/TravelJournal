@@ -1,10 +1,10 @@
 package com.vuceljic.elena.journal.application.services
 
+import com.vuceljic.elena.journal.domain.repository.JournalRepository
 import com.vuceljic.elena.journal.presentation.dto.JournalEntryDto
 import com.vuceljic.elena.journal.presentation.dto.toDto
 import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUpdateRequest
 import com.vuceljic.elena.journal.presentation.http.request.toDomain
-import com.vuceljic.elena.journal.domain.repository.JournalRepository
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 
@@ -13,6 +13,10 @@ class JournalService {
 
     @Inject
     lateinit var journalRepository: JournalRepository
+
+    fun getAll(): List<JournalEntryDto> {
+        return journalRepository.getAll().map { it.toDto() }
+    }
 
     fun findEntryById(id: Long): JournalEntryDto? {
         return journalRepository.find(id)?.toDto()

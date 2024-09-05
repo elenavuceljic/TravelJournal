@@ -7,6 +7,10 @@ import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class JournalRepositoryImpl : PanacheRepository<JournalEntryEntity>, JournalRepository {
+    override fun getAll(): List<JournalEntry> {
+        return listAll().map { it.toDomain() }
+    }
+
     override fun find(id: Long): JournalEntry? {
         return findById(id)?.toDomain()
     }
