@@ -11,10 +11,21 @@ import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class JournalRepositoryImpl : PanacheRepository<JournalEntryEntity>, JournalRepository {
-    override fun getAll(page: Int, pageSize: Int, sort: Sorting): List<JournalEntry> {
-        val query = findAll(parseSort(sort))
+
+    companion object {
+        private const val QUERY_SEARCH_TITLE_AND_DESCRIPTION = "title like ?1 or description like ?1"
+    }
+
+    override fun getAll(page: Int, pageSize: Int, searchQuery: String?, sort: Sorting): List<JournalEntry> {
+        val panacheSort = parseSort(sort)
+        val query = if (searchQuery == null) {
+            findAll(panacheSort)
+        } else {
+            find(QUERY_SEARCH_TITLE_AND_DESCRIPTION, panacheSort, "%$searchQuery%")
+        }
         query.page(Page.of(page, pageSize))
-        return query.list().map { it.toDomain() }
+        val list = query.list()
+        return list.map { it.toDomain() }
     }
 
     private fun parseSort(sort: Sorting): Sort {
@@ -48,5 +59,11 @@ class JournalRepositoryImpl : PanacheRepository<JournalEntryEntity>, JournalRepo
         return entity.id
     }
 
-    override fun countAll(): Long = count()
+    override fun countAll(query: String?): Long {
+        return if (query != null) {
+            count(QUERY_SEARCH_TITLE_AND_DESCRIPTION, "%$query%")
+        } else {
+            count()
+        }
+    }
 }

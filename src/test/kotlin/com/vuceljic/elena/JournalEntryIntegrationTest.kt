@@ -153,6 +153,56 @@ open class JournalEntryIntegrationTest {
 
     @Order(9)
     @Test
+    fun testSearchAllJournalEntries() {
+        Given {
+          queryParam("query", "land")
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(1))
+            body("items[1].id", equalTo(2))
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(1))
+            body("totalItems", equalTo(2))
+        }
+    }
+
+    @Order(9)
+    @Test
+    fun testSearchAllJournalEntriesPagination() {
+        Given {
+          queryParam("query", "land")
+          queryParam("page", 1)
+          queryParam("size", 1)
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(2))
+            body("currentPage", equalTo(1))
+            body("totalPages", equalTo(2))
+            body("totalItems", equalTo(2))
+        }
+    }
+
+    @Order(9)
+    @Test
+    fun testSearchAllJournalEntriesNoResultFound() {
+        Given {
+          queryParam("query", "xyz")
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(0))
+            body("totalItems", equalTo(0))
+        }
+    }
+
+    @Order(9)
+    @Test
     fun testDeleteJournalEntry() {
         Given {
             pathParam("id", "3")

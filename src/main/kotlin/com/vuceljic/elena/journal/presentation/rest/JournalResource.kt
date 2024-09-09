@@ -1,7 +1,6 @@
 package com.vuceljic.elena.journal.presentation.rest
 
 import com.vuceljic.elena.journal.application.services.JournalService
-import com.vuceljic.elena.journal.domain.model.Sorting
 import com.vuceljic.elena.journal.presentation.dto.JournalEntryDto
 import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUpdateRequest
 import com.vuceljic.elena.journal.presentation.http.request.SortingOrderQueryParam
@@ -12,7 +11,6 @@ import jakarta.validation.constraints.Min
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import org.jboss.resteasy.reactive.RestQuery
 import java.net.URI
 
 @Path("/journal")
@@ -30,12 +28,13 @@ class JournalResource {
 
     @GET
     fun getAll(
-        @RestQuery("page") @DefaultValue("$DEFAULT_PAGE") @Min(0) page: Int,
-        @RestQuery("size") @DefaultValue("$DEFAULT_PAGE_SIZE") @Min(1) pageSize: Int,
+        @QueryParam("page") @DefaultValue("$DEFAULT_PAGE") @Min(0) page: Int,
+        @QueryParam("size") @DefaultValue("$DEFAULT_PAGE_SIZE") @Min(1) pageSize: Int,
+        @QueryParam("query") query: String?,
         @QueryParam("sortByEntryDate") sortByEntryDate: SortingOrderQueryParam?,
         @QueryParam("sortByTitle") sortByTitle: SortingOrderQueryParam?
     ): PaginatedResponse<JournalEntryDto> {
-        return journalService.getAll(page, pageSize, sortByEntryDate, sortByTitle)
+        return journalService.getAll(page, pageSize, query, sortByEntryDate, sortByTitle)
     }
 
     @GET

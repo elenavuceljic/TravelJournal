@@ -20,12 +20,13 @@ class JournalService {
     fun getAll(
         page: Int,
         pageSize: Int,
+        query: String?,
         byEntryDate: SortingOrderQueryParam?,
         byTitle: SortingOrderQueryParam?
     ): PaginatedResponse<JournalEntryDto> {
         val sort = Sorting(byEntryDate?.toDomain(), byTitle?.toDomain())
-        val entryDtoList = journalRepository.getAll(page, pageSize, sort).map { it.toDto() }
-        val totalItems = journalRepository.countAll()
+        val entryDtoList = journalRepository.getAll(page, pageSize, query, sort).map { it.toDto() }
+        val totalItems = journalRepository.countAll(query)
         val totalPages = totalItems.ceilDiv(pageSize)
         return PaginatedResponse(entryDtoList, page, totalPages, totalItems)
     }
