@@ -1,8 +1,8 @@
 package com.vuceljic.elena.journal.presentation.rest
 
 import com.vuceljic.elena.journal.application.services.JournalService
-import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUpdateRequest
 import com.vuceljic.elena.journal.presentation.dto.JournalEntryDto
+import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUpdateRequest
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
@@ -16,7 +16,7 @@ import java.net.URI
 class JournalResource {
 
     @Inject
-    lateinit var journalService: JournalService
+    private lateinit var journalService: JournalService
 
     @GET
     @Path("/{id}")
@@ -38,7 +38,8 @@ class JournalResource {
     @Path("/{id}")
     @Transactional
     fun update(id: Long, updatedJournalEntry: JournalEntryCreateUpdateRequest): JournalEntryDto {
-        return journalService.updateEntry(id, updatedJournalEntry) ?: throw NotFoundException("No journal entry with id $id")
+        return journalService.updateEntry(id, updatedJournalEntry)
+            ?: throw NotFoundException("No journal entry with id $id")
     }
 
     @POST

@@ -12,7 +12,7 @@ import jakarta.inject.Inject
 class JournalService {
 
     @Inject
-    lateinit var journalRepository: JournalRepository
+    private lateinit var journalRepository: JournalRepository
 
     fun findEntryById(id: Long): JournalEntryDto? {
         return journalRepository.find(id)?.toDto()
