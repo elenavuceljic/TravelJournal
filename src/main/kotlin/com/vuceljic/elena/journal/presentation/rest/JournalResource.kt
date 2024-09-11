@@ -24,7 +24,7 @@ class JournalResource {
     }
 
     @Inject
-    lateinit var journalService: JournalService
+    private lateinit var journalService: JournalService
 
     @GET
     fun getAll(
