@@ -8,12 +8,122 @@ import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import org.hamcrest.Matchers.equalTo
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
 
 @QuarkusTest
 @TestHTTPEndpoint(JournalResource::class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 open class JournalEntryIntegrationTest {
 
+    @Order(1)
+    @Test
+    fun testGetAllJournalEntries() {
+        Given {
+            queryParam("page", 2)
+            queryParam("size", 1)
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(3))
+            body("currentPage", equalTo(2))
+            body("totalPages", equalTo(3))
+            body("totalItems", equalTo(3))
+        }
+    }
+
+    @Order(2)
+    @Test
+    fun testGetAllJournalEntriesDefaultParams() {
+        When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(1))
+            body("items[1].id", equalTo(2))
+            body("items[2].id", equalTo(3))
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(1))
+            body("totalItems", equalTo(3))
+        }
+    }
+
+    @Order(3)
+    @Test
+    fun testGetAllJournalEntriesSortByEntryDateAsc() {
+        Given {
+            queryParam("sortByEntryDate", "ASC")
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(3))
+            body("items[1].id", equalTo(2))
+            body("items[2].id", equalTo(1))
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(1))
+            body("totalItems", equalTo(3))
+        }
+    }
+
+    @Order(4)
+    @Test
+    fun testGetAllJournalEntriesSortByEntryDateDesc() {
+        Given {
+            queryParam("sortByEntryDate", "DESC")
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(1))
+            body("items[1].id", equalTo(2))
+            body("items[2].id", equalTo(3))
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(1))
+            body("totalItems", equalTo(3))
+        }
+    }
+
+    @Order(5)
+    @Test
+    fun testGetAllJournalEntriesSortByTitleDesc() {
+        Given {
+            queryParam("sortByTitle", "DESC")
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(3))
+            body("items[1].id", equalTo(2))
+            body("items[2].id", equalTo(1))
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(1))
+            body("totalItems", equalTo(3))
+        }
+    }
+
+    @Order(6)
+    @Test
+    fun testGetAllJournalEntriesSortByTitleAsc() {
+        Given {
+            queryParam("sortByTitle", "ASC")
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(1))
+            body("items[1].id", equalTo(2))
+            body("items[2].id", equalTo(3))
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(1))
+            body("totalItems", equalTo(3))
+        }
+    }
+
+    @Order(7)
     @Test
     fun testGetJournalEntry() {
         Given {
@@ -29,6 +139,7 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(8)
     @Test
     fun testGetJournalEntryNotFound() {
         Given {
@@ -40,6 +151,57 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(9)
+    @Test
+    fun testSearchAllJournalEntries() {
+        Given {
+          queryParam("query", "land")
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(1))
+            body("items[1].id", equalTo(2))
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(1))
+            body("totalItems", equalTo(2))
+        }
+    }
+
+    @Order(9)
+    @Test
+    fun testSearchAllJournalEntriesPagination() {
+        Given {
+          queryParam("query", "land")
+          queryParam("page", 1)
+          queryParam("size", 1)
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("items[0].id", equalTo(2))
+            body("currentPage", equalTo(1))
+            body("totalPages", equalTo(2))
+            body("totalItems", equalTo(2))
+        }
+    }
+
+    @Order(9)
+    @Test
+    fun testSearchAllJournalEntriesNoResultFound() {
+        Given {
+          queryParam("query", "xyz")
+        } When {
+            get("")
+        } Then {
+            statusCode(200)
+            body("currentPage", equalTo(0))
+            body("totalPages", equalTo(0))
+            body("totalItems", equalTo(0))
+        }
+    }
+
+    @Order(9)
     @Test
     fun testDeleteJournalEntry() {
         Given {
@@ -51,6 +213,7 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(10)
     @Test
     fun testDeleteJournalEntryNotFound() {
         Given {
@@ -62,6 +225,7 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(11)
     @Test
     fun testUpdateJournalEntry() {
         Given {
@@ -79,6 +243,7 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(12)
     @Test
     fun testUpdateJournalEntryWithTitleTooLong() {
         Given {
@@ -95,6 +260,7 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(13)
     @Test
     fun testUpdateJournalEntryNotFound() {
         Given {
@@ -108,6 +274,7 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(14)
     @Test
     fun testCreateJournalEntry() {
         Given {
@@ -121,6 +288,7 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(15)
     @Test
     fun testCreateJournalEntryWithTitleTooLong() {
         Given {
