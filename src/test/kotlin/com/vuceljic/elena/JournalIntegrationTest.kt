@@ -3,6 +3,7 @@ package com.vuceljic.elena
 import com.vuceljic.elena.journal.presentation.rest.JournalResource
 import io.quarkus.test.common.http.TestHTTPEndpoint
 import io.quarkus.test.junit.QuarkusTest
+import io.quarkus.test.security.TestSecurity
 import io.restassured.http.ContentType
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
@@ -13,10 +14,12 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 
+
 @QuarkusTest
 @TestHTTPEndpoint(JournalResource::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-open class JournalEntryIntegrationTest {
+@TestSecurity(authorizationEnabled = false)
+open class JournalIntegrationTest {
 
     @Order(1)
     @Test
@@ -32,6 +35,20 @@ open class JournalEntryIntegrationTest {
             body("currentPage", equalTo(2))
             body("totalPages", equalTo(3))
             body("totalItems", equalTo(3))
+        }
+    }
+
+    @Order(1)
+    @Test
+    @TestSecurity(authorizationEnabled = true)
+    fun testGetAllJournalEntriesWithoutAuth() {
+        Given {
+            queryParam("page", 2)
+            queryParam("size", 1)
+        } When {
+            get("")
+        } Then {
+            statusCode(401)
         }
     }
 
@@ -139,6 +156,19 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(7)
+    @Test
+    @TestSecurity(authorizationEnabled = true)
+    fun testGetJournalEntryWithoutAuth() {
+        Given {
+            pathParam("id", "1")
+        } When {
+            get("/{id}")
+        } Then {
+            statusCode(401)
+        }
+    }
+
     @Order(8)
     @Test
     fun testGetJournalEntryNotFound() {
@@ -155,7 +185,7 @@ open class JournalEntryIntegrationTest {
     @Test
     fun testSearchAllJournalEntries() {
         Given {
-          queryParam("query", "land")
+            queryParam("query", "land")
         } When {
             get("")
         } Then {
@@ -172,9 +202,9 @@ open class JournalEntryIntegrationTest {
     @Test
     fun testSearchAllJournalEntriesPagination() {
         Given {
-          queryParam("query", "land")
-          queryParam("page", 1)
-          queryParam("size", 1)
+            queryParam("query", "land")
+            queryParam("page", 1)
+            queryParam("size", 1)
         } When {
             get("")
         } Then {
@@ -190,7 +220,7 @@ open class JournalEntryIntegrationTest {
     @Test
     fun testSearchAllJournalEntriesNoResultFound() {
         Given {
-          queryParam("query", "xyz")
+            queryParam("query", "xyz")
         } When {
             get("")
         } Then {
@@ -210,6 +240,19 @@ open class JournalEntryIntegrationTest {
             delete("/{id}")
         } Then {
             statusCode(204)
+        }
+    }
+
+    @Order(9)
+    @Test
+    @TestSecurity(authorizationEnabled = true)
+    fun testDeleteJournalEntryWithoutAuth() {
+        Given {
+            pathParam("id", "3")
+        } When {
+            delete("/{id}")
+        } Then {
+            statusCode(401)
         }
     }
 
@@ -243,6 +286,21 @@ open class JournalEntryIntegrationTest {
         }
     }
 
+    @Order(11)
+    @Test
+    @TestSecurity(authorizationEnabled = true)
+    fun testUpdateJournalEntryWithoutAuth() {
+        Given {
+            pathParam("id", "2")
+            contentType(ContentType.JSON)
+            body(testJournalEntry)
+        } When {
+            put("/{id}")
+        } Then {
+            statusCode(401)
+        }
+    }
+
     @Order(12)
     @Test
     fun testUpdateJournalEntryWithTitleTooLong() {
@@ -256,7 +314,10 @@ open class JournalEntryIntegrationTest {
             statusCode(400)
             body("errors[0].property", equalTo("title"))
             body("errors[0].message", equalTo("Title must be between 1 and 40 characters"))
-            body("errors[0].invalidValue", equalTo("Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife"))
+            body(
+                "errors[0].invalidValue",
+                equalTo("Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife")
+            )
         }
     }
 
@@ -300,7 +361,24 @@ open class JournalEntryIntegrationTest {
             statusCode(400)
             body("errors[0].property", equalTo("title"))
             body("errors[0].message", equalTo("Title must be between 1 and 40 characters"))
-            body("errors[0].invalidValue", equalTo("Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife"))
+            body(
+                "errors[0].invalidValue",
+                equalTo("Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife Tenerife")
+            )
+        }
+    }
+
+    @Order(15)
+    @Test
+    @TestSecurity(authorizationEnabled = true)
+    fun testCreateJournalEntryWithoutAuth() {
+        Given {
+            contentType(ContentType.JSON)
+            body(testJournalEntry)
+        } When {
+            post("")
+        } Then {
+            statusCode(401)
         }
     }
 
@@ -319,5 +397,4 @@ open class JournalEntryIntegrationTest {
           "entryDate": "1995-09-15T00:00:00Z"
         }
     """.trimIndent()
-
 }
