@@ -18,29 +18,29 @@ import org.junit.jupiter.api.TestMethodOrder
 @QuarkusTest
 @TestHTTPEndpoint(JournalResource::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-@TestSecurity(authorizationEnabled = false)
+@TestSecurity(user = "auth0|671b7f573cb8c3f9176453af")
 open class JournalIntegrationTest {
 
     @Order(1)
     @Test
     fun testGetAllJournalEntries() {
         Given {
-            queryParam("page", 2)
+            queryParam("page", 1)
             queryParam("size", 1)
         } When {
             get("")
         } Then {
             statusCode(200)
             body("items[0].id", equalTo(3))
-            body("currentPage", equalTo(2))
-            body("totalPages", equalTo(3))
-            body("totalItems", equalTo(3))
+            body("currentPage", equalTo(1))
+            body("totalPages", equalTo(2))
+            body("totalItems", equalTo(2))
         }
     }
 
     @Order(1)
     @Test
-    @TestSecurity(authorizationEnabled = true)
+    @TestSecurity(user = "")
     fun testGetAllJournalEntriesWithoutAuth() {
         Given {
             queryParam("page", 2)
@@ -59,12 +59,11 @@ open class JournalIntegrationTest {
             get("")
         } Then {
             statusCode(200)
-            body("items[0].id", equalTo(1))
-            body("items[1].id", equalTo(2))
-            body("items[2].id", equalTo(3))
+            body("items[0].id", equalTo(2))
+            body("items[1].id", equalTo(3))
             body("currentPage", equalTo(0))
             body("totalPages", equalTo(1))
-            body("totalItems", equalTo(3))
+            body("totalItems", equalTo(2))
         }
     }
 
@@ -79,10 +78,9 @@ open class JournalIntegrationTest {
             statusCode(200)
             body("items[0].id", equalTo(3))
             body("items[1].id", equalTo(2))
-            body("items[2].id", equalTo(1))
             body("currentPage", equalTo(0))
             body("totalPages", equalTo(1))
-            body("totalItems", equalTo(3))
+            body("totalItems", equalTo(2))
         }
     }
 
@@ -95,12 +93,11 @@ open class JournalIntegrationTest {
             get("")
         } Then {
             statusCode(200)
-            body("items[0].id", equalTo(1))
-            body("items[1].id", equalTo(2))
-            body("items[2].id", equalTo(3))
+            body("items[0].id", equalTo(2))
+            body("items[1].id", equalTo(3))
             body("currentPage", equalTo(0))
             body("totalPages", equalTo(1))
-            body("totalItems", equalTo(3))
+            body("totalItems", equalTo(2))
         }
     }
 
@@ -115,10 +112,9 @@ open class JournalIntegrationTest {
             statusCode(200)
             body("items[0].id", equalTo(3))
             body("items[1].id", equalTo(2))
-            body("items[2].id", equalTo(1))
             body("currentPage", equalTo(0))
             body("totalPages", equalTo(1))
-            body("totalItems", equalTo(3))
+            body("totalItems", equalTo(2))
         }
     }
 
@@ -131,12 +127,11 @@ open class JournalIntegrationTest {
             get("")
         } Then {
             statusCode(200)
-            body("items[0].id", equalTo(1))
-            body("items[1].id", equalTo(2))
-            body("items[2].id", equalTo(3))
+            body("items[0].id", equalTo(2))
+            body("items[1].id", equalTo(3))
             body("currentPage", equalTo(0))
             body("totalPages", equalTo(1))
-            body("totalItems", equalTo(3))
+            body("totalItems", equalTo(2))
         }
     }
 
@@ -144,21 +139,33 @@ open class JournalIntegrationTest {
     @Test
     fun testGetJournalEntry() {
         Given {
-            pathParam("id", "1")
+            pathParam("id", "2")
         } When {
             get("/{id}")
         } Then {
             statusCode(200)
-            body("id", equalTo(1))
-            body("title", equalTo("Iceland"))
-            body("description", equalTo("Aurora Borealis hunting"))
-            body("entryDate", equalTo("1995-09-12T00:00:00Z"))
+            body("id", equalTo(2))
+            body("title", equalTo("Ireland"))
+            body("description", equalTo("Cliff hanging"))
+            body("entryDate", equalTo("1995-09-11T00:00:00Z"))
         }
     }
 
     @Order(7)
     @Test
-    @TestSecurity(authorizationEnabled = true)
+    fun testGetJournalEntryNotOwnedByUser() {
+        Given {
+            pathParam("id", "1")
+        } When {
+            get("/{id}")
+        } Then {
+            statusCode(404)
+        }
+    }
+
+    @Order(7)
+    @Test
+    @TestSecurity(user = "")
     fun testGetJournalEntryWithoutAuth() {
         Given {
             pathParam("id", "1")
@@ -245,7 +252,19 @@ open class JournalIntegrationTest {
 
     @Order(9)
     @Test
-    @TestSecurity(authorizationEnabled = true)
+    fun testDeleteJournalEntryNotOwnedByUser() {
+        Given {
+            pathParam("id", "1")
+        } When {
+            delete("/{id}")
+        } Then {
+            statusCode(404)
+        }
+    }
+
+    @Order(9)
+    @Test
+    @TestSecurity(user = "")
     fun testDeleteJournalEntryWithoutAuth() {
         Given {
             pathParam("id", "3")
@@ -288,7 +307,21 @@ open class JournalIntegrationTest {
 
     @Order(11)
     @Test
-    @TestSecurity(authorizationEnabled = true)
+    fun testUpdateJournalEntryNotOwnedByUser() {
+        Given {
+            pathParam("id", "1")
+            contentType(ContentType.JSON)
+            body(testJournalEntry)
+        } When {
+            put("/{id}")
+        } Then {
+            statusCode(404)
+        }
+    }
+
+    @Order(11)
+    @Test
+    @TestSecurity(user = "")
     fun testUpdateJournalEntryWithoutAuth() {
         Given {
             pathParam("id", "2")
@@ -370,7 +403,7 @@ open class JournalIntegrationTest {
 
     @Order(15)
     @Test
-    @TestSecurity(authorizationEnabled = true)
+    @TestSecurity(user = "")
     fun testCreateJournalEntryWithoutAuth() {
         Given {
             contentType(ContentType.JSON)

@@ -13,15 +13,22 @@ import jakarta.enterprise.context.ApplicationScoped
 class JournalRepositoryImpl : PanacheRepository<JournalEntryEntity>, JournalRepository {
 
     companion object {
-        private const val QUERY_SEARCH_TITLE_AND_DESCRIPTION = "title like ?1 or description like ?1"
+        private const val QUERY_SEARCH_TITLE_AND_DESCRIPTION = "title like ?1 or description like ?1 and userId = ?2"
+        private const val QUERY_BY_USER_ID = "userId = ?1"
     }
 
-    override fun getAll(page: Int, pageSize: Int, searchQuery: String?, sort: Sorting): List<JournalEntry> {
+    override fun getAll(
+        page: Int,
+        pageSize: Int,
+        searchQuery: String?,
+        sort: Sorting,
+        userId: String
+    ): List<JournalEntry> {
         val panacheSort = parseSort(sort)
         val query = if (searchQuery == null) {
-            findAll(panacheSort)
+            find(QUERY_BY_USER_ID, panacheSort, userId)
         } else {
-            find(QUERY_SEARCH_TITLE_AND_DESCRIPTION, panacheSort, "%$searchQuery%")
+            find(QUERY_SEARCH_TITLE_AND_DESCRIPTION, panacheSort, "%$searchQuery%", userId)
         }
         query.page(Page.of(page, pageSize))
         val list = query.list()
@@ -38,12 +45,21 @@ class JournalRepositoryImpl : PanacheRepository<JournalEntryEntity>, JournalRepo
         }
     }
 
-    override fun find(id: Long): JournalEntry? = findById(id)?.toDomain()
+    override fun find(id: Long, userId: String): JournalEntry? {
+        val entity = findById(id)
+        if (entity?.userId != userId) return null
+        return entity.toDomain()
+    }
 
-    override fun delete(id: Long): Boolean = deleteById(id)
+    override fun delete(id: Long, userId: String): Boolean {
+        val entity = findById(id)
+        if (entity?.userId != userId) return false
+        return deleteById(id)
+    }
 
     override fun update(id: Long, updatedEntry: JournalEntry): JournalEntry? {
         val entity = findById(id) ?: return null
+        if (entity.userId != updatedEntry.userId) return null
 
         entity.title = updatedEntry.title
         entity.description = updatedEntry.description
@@ -59,11 +75,11 @@ class JournalRepositoryImpl : PanacheRepository<JournalEntryEntity>, JournalRepo
         return entity.id
     }
 
-    override fun countAll(query: String?): Long {
+    override fun countAll(query: String?, userId: String): Long {
         return if (query != null) {
-            count(QUERY_SEARCH_TITLE_AND_DESCRIPTION, "%$query%")
+            count(QUERY_SEARCH_TITLE_AND_DESCRIPTION, "%$query%", userId)
         } else {
-            count()
+            count(QUERY_BY_USER_ID, userId)
         }
     }
 }

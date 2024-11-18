@@ -8,6 +8,7 @@ import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUp
 import com.vuceljic.elena.journal.presentation.http.request.SortingOrderQueryParam
 import com.vuceljic.elena.journal.presentation.http.request.toDomain
 import com.vuceljic.elena.journal.presentation.http.respose.PaginatedResponse
+import io.quarkus.security.identity.SecurityIdentity
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 
@@ -17,6 +18,9 @@ class JournalService {
     @Inject
     private lateinit var journalRepository: JournalRepository
 
+    @Inject
+    private lateinit var securityIdentity: SecurityIdentity
+
     fun getAll(
         page: Int,
         pageSize: Int,
@@ -24,9 +28,10 @@ class JournalService {
         byEntryDate: SortingOrderQueryParam?,
         byTitle: SortingOrderQueryParam?
     ): PaginatedResponse<JournalEntryDto> {
+        val userId = securityIdentity.principal.name
         val sort = Sorting(byEntryDate?.toDomain(), byTitle?.toDomain())
-        val entryDtoList = journalRepository.getAll(page, pageSize, query, sort).map { it.toDto() }
-        val totalItems = journalRepository.countAll(query)
+        val entryDtoList = journalRepository.getAll(page, pageSize, query, sort, userId).map { it.toDto() }
+        val totalItems = journalRepository.countAll(query, userId)
         val totalPages = totalItems.ceilDiv(pageSize)
         return PaginatedResponse(entryDtoList, page, totalPages, totalItems)
     }
@@ -36,20 +41,24 @@ class JournalService {
     }
 
     fun findEntryById(id: Long): JournalEntryDto? {
-        return journalRepository.find(id)?.toDto()
+        val userId = securityIdentity.principal.name
+        return journalRepository.find(id, userId)?.toDto()
     }
 
     fun deleteEntryById(id: Long): Boolean {
-        return journalRepository.delete(id)
+        val userId = securityIdentity.principal.name
+        return journalRepository.delete(id, userId)
     }
 
     fun updateEntry(id: Long, updateRequest: JournalEntryCreateUpdateRequest): JournalEntryDto? {
-        val updatedEntry = journalRepository.update(id, updateRequest.toDomain())
+        val userId = securityIdentity.principal.name
+        val updatedEntry = journalRepository.update(id, updateRequest.toDomain(userId))
         return updatedEntry?.toDto()
     }
 
     fun insertEntry(journalEntryDto: JournalEntryCreateUpdateRequest): Long? {
-        val newEntry = journalEntryDto.toDomain()
+        val userId = securityIdentity.principal.name
+        val newEntry = journalEntryDto.toDomain(userId)
         return journalRepository.insert(newEntry)
     }
 }

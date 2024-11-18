@@ -13,9 +13,10 @@ data class JournalEntryCreateUpdateRequest(
     val entryDate: Instant,
 )
 
-fun JournalEntryCreateUpdateRequest.toDomain(): JournalEntry = JournalEntry(
+fun JournalEntryCreateUpdateRequest.toDomain(userId: String): JournalEntry = JournalEntry(
     id = null,
     title = this.title,
     description = this.description,
-    entryDate = this.entryDate
+    entryDate = this.entryDate,
+    userId = userId
 )

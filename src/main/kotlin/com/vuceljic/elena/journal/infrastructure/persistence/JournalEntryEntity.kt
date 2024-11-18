@@ -33,13 +33,16 @@ open class JournalEntryEntity {
 
     @field:UpdateTimestamp(source = SourceType.DB)
     lateinit var updatedAt: Instant
+
+    lateinit var userId: String
 }
 
 fun JournalEntryEntity.toDomain(): JournalEntry = JournalEntry(
     id = id!!,
     title = title,
     description = description,
-    entryDate = entryDate
+    entryDate = entryDate,
+    userId = userId
 )
 
 fun JournalEntry.toEntity(): JournalEntryEntity = JournalEntryEntity().also {
