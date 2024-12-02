@@ -7,4 +7,5 @@ data class JournalEntry(
     val title: String,
     val description: String,
     val entryDate: Instant,
+    val userId: String,
 )

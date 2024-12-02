@@ -5,6 +5,7 @@ import com.vuceljic.elena.journal.presentation.dto.JournalEntryDto
 import com.vuceljic.elena.journal.presentation.http.request.JournalEntryCreateUpdateRequest
 import com.vuceljic.elena.journal.presentation.http.request.SortingOrderQueryParam
 import com.vuceljic.elena.journal.presentation.http.respose.PaginatedResponse
+import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.validation.constraints.Min
@@ -16,6 +17,7 @@ import java.net.URI
 @Path("/journal")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Authenticated
 class JournalResource {
 
     companion object {
